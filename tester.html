@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropdown Selections</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .container {
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>Tester Selections</title>
+    <link rel="icon" type="image/x-icon" href="JC Icon.webp">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="container">
-    <label for="dropdown1">DUT style:</label>
-    <select id="dropdown1" onchange="updateText()">
+<div class="container" id="container1">
+    <label for="dropdown1">Function:</label>
+    <select id="dropdown1" onchange="showNextDropdown(1)">
         <option value="default1">Select an option</option>
-        <option value="Micro oled + B2B">Micro oled + B2B</option>
-        <option value="Cell + Flex">Cell + Flex</option>
+        <option value="EE test">EE test</option>
+        <option value="Touch test">Touch test</option>
+        <option value="Light leakage">Light leakage</option>
+        <option value="Display">Display</option>
+
     </select>
 </div>
 
-<div class="container">
-    <label for="dropdown2">Size :</label>
-    <select id="dropdown2" onchange="updateText()">
+<div class="container" id="container2" style="display: none;">
+    <label for="dropdown2">Dut style:</label>
+    <select id="dropdown2" onchange="showNextDropdown(2)">
         <option value="default2">Select an option</option>
+        <option value="Micro oled + B2B">Micro oled + B2B</option>
+        <option value="Cell + Flex">Cell + Flex</option>
+        <option value="Cirved Cell + Flex">Cirved Cell + Flex</option>
+        <option value="2D backlight">2D backlight</option>
+        <option value="Micro oled Bare die">Micro oled Bare die</option>
+    </select>
+</div>
+
+<div class="container" id="container3" style="display: none;">
+    <label for="dropdown3">Size:</label>
+    <select id="dropdown3" onchange="updateText()">
+        <option value="default3">Select an option</option>
         <option value="1.4">1.4</option>
         <option value="13">13</option>
         <option value="11-13">11-13</option>
@@ -40,35 +48,76 @@
     </select>
 </div>
 
-<div class="container">
-    <label for="dropdown3">Function: :</label>
-    <select id="dropdown3" onchange="updateText()">
-        <option value="default3">Select an option</option>
-        <option value="EE test">EE test</option>
-        <option value="Touch test">Touch test</option>
-        <option value="Light leakage">Light leakage</option>
-        <option value="Display">Display</option>
-    </select>
-</div>
-
 <div id="output">Please make selections from the dropdowns above.</div>
 
+<div id="image-container" style="display: none;">
+    <img id="selection-image" src="" alt="Selected Image">
+</div>
+
 <script>
+    function showNextDropdown(dropdownNumber) {
+        const func = document.getElementById('dropdown1').value;
+        const dut = document.getElementById('dropdown2').value;
+        
+        if (dropdownNumber === 1 && func !== 'default1') {
+            document.getElementById('container2').style.display = 'block';
+        }
+        
+        if (dropdownNumber === 2 && dut !== 'default2') {
+            document.getElementById('container3').style.display = 'block';
+        }
+
+        updateText();
+    }
+
     function updateText() {
         const dut = document.getElementById('dropdown1').value;
         const size = document.getElementById('dropdown2').value;
         const func = document.getElementById('dropdown3').value;
         const output = document.getElementById('output');
+        const imageContainer = document.getElementById('image-container');
+        const selectionImage = document.getElementById('selection-image');
+
 
         if (dut !== 'default1' && size !== 'default2' && func !== 'default3') {
             output.textContent = `You selected ${dut}, ${size}, and ${func}.`;
+
+            // Set images based on the selections
+            const images = [
+                `images/${dut}_${size}_${func}_1.jpg`,
+                `images/${dut}_${size}_${func}_2.jpg`,
+                `images/${dut}_${size}_${func}_3.jpg`
+            ];
+
+            // Clear previous images
+            imageContainer.innerHTML = '';
+
+            // Check and add new images
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+                img.alt = `Image for ${dut}, ${size}, ${func}`;
+                img.classList.add('selection-image');
+
+                img.onload = () => {
+                    imageContainer.appendChild(img);
+                    imageContainer.style.display = 'block';
+                };
+
+                img.onerror = () => {
+                    console.log(`Image not found: ${src}`);
+                };
+            });
+            imageContainer.style.display = 'block';
+
         } else {
             output.textContent = 'Please make selections from the dropdowns above.';
+            imageContainer.style.display = 'none';
         }
 
-        if (dut === 'Micro oled + B2B' && size === '1.4' && func === 'EE test') {
-            output.textContent += '\n stand along, ELU.'
-        }
+       // if (dut === 'Micro oled + B2B' && size === '1.4' && func === 'EE test') {
+         //   output.textContent += '\n stand alone, ELU.'
+        //}
     } 
 </script>
 
